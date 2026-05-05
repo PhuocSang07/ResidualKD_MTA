@@ -25,7 +25,7 @@ TEACHER_CKPT="VoCuc/Mistral7B_Dolly_SFT"
 TEACHER_CKPT_NAME="mistral-7B-dolly-sft"
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/mistral/"
 
-BATCH_SIZE=32
+BATCH_SIZE=64
 EVAL_BATCH_SIZE=64
 GRAD_ACC=1
 D_BOTTLENECK=64

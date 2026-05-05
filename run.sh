@@ -15,10 +15,10 @@ run() {
     echo "===== DONE:  $1 =====" | tee -a "$log"
 }
 
-# run install.sh
+run install.sh
 
 # Activate the venv installed above so torchrun is on PATH for all sub-scripts
-# source "$SCRIPT_DIR/.venv/bin/activate"
+source "$SCRIPT_DIR/.venv/bin/activate"
 
 cd MTA/
 # Phase 1: Pretrain Projectors

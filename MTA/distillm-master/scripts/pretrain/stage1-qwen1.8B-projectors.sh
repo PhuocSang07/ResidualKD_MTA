@@ -27,7 +27,7 @@ TEACHER_CKPT_NAME="qwen1.5-1.8B-sft-dolly"
 
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=32
+BATCH_SIZE=64
 EVAL_BATCH_SIZE=64
 GRAD_ACC=1
 D_BOTTLENECK=64

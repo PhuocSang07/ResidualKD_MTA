@@ -19,7 +19,7 @@ DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE \
                   --master_addr $MASTER_ADDR \
                   --master_port $MASTER_PORT"
 
-BASE_PATH=./distillm-master
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; while [[ "$(basename "$BASE_PATH")" != "distillm-master" ]] && [[ "$BASE_PATH" != "/" ]]; do BASE_PATH="$(dirname "$BASE_PATH")"; done
 
 TEACHER_CKPT="VoCuc/Mistral7B_Dolly_SFT"
 TEACHER_CKPT_NAME="mistral-7B-dolly-sft"

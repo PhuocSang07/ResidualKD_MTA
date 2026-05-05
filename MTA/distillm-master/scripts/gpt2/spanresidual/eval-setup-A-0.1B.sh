@@ -16,7 +16,7 @@ set -e
 RUN_DIR="${1:?Usage: $0 <run_dir> [ckpt_step]}"
 CKPT_STEP="${2:-}"
 
-BASE_PATH=./distillm-master
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; while [[ "$(basename "$BASE_PATH")" != "distillm-master" ]] && [[ "$BASE_PATH" != "/" ]]; do BASE_PATH="$(dirname "$BASE_PATH")"; done
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MLJ_ROOT="$(realpath "${SCRIPT_DIR}/../../../../../")"
 EVAL_SCRIPT="${MLJ_ROOT}/Multi-Level-OT/eval_generate.py"

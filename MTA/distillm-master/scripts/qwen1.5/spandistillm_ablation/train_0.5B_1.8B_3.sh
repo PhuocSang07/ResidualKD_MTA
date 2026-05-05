@@ -17,7 +17,7 @@ DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE \
                   --master_port $MASTER_PORT"
 
 # model
-BASE_PATH=./distillm-master
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; while [[ "$(basename "$BASE_PATH")" != "distillm-master" ]] && [[ "$BASE_PATH" != "/" ]]; do BASE_PATH="$(dirname "$BASE_PATH")"; done
 CKPT_NAME="qwen1.5-0.5B"
 CKPT="Qwen/Qwen1.5-0.5B"
 TEACHER_CKPT_NAME="qwen1.5-1.8B"

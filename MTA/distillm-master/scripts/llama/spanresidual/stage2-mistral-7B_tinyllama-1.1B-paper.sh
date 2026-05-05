@@ -24,7 +24,7 @@ DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE \
                   --master_addr $MASTER_ADDR \
                   --master_port $MASTER_PORT"
 
-BASE_PATH=./distillm-master
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; while [[ "$(basename "$BASE_PATH")" != "distillm-master" ]] && [[ "$BASE_PATH" != "/" ]]; do BASE_PATH="$(dirname "$BASE_PATH")"; done
 
 CKPT="TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 CKPT_NAME="tinyllama-1.1b"

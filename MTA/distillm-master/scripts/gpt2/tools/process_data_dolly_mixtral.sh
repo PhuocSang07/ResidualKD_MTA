@@ -2,7 +2,7 @@
 # Process Dolly with Mixtral-8x7B tokenizer for cross-tokenizer KD.
 # Output: processed_data/dolly/full/mixtral/
 
-BASE_PATH=./distillm-master
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; while [[ "$(basename "$BASE_PATH")" != "distillm-master" ]] && [[ "$BASE_PATH" != "/" ]]; do BASE_PATH="$(dirname "$BASE_PATH")"; done
 
 export TF_CPP_MIN_LOG_LEVEL=3
 export PYTHONPATH=${BASE_PATH}

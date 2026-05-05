@@ -27,7 +27,8 @@ pip install "$TORCH" "$TVISION" --index-url "https://download.pytorch.org/whl/${
 
 # 3. Training & evaluation libraries
 pip install transformers peft datasets accelerate tqdm wandb numpy \
-    rouge-score bert-score evaluate nltk scikit-learn pandas pyarrow --quiet
+    rouge-score bert-score evaluate nltk scikit-learn pandas pyarrow deepspeed \
+    pyyaml psutil fire packaging sentencepiece torchtyping numerize protobuf --quiet
 
 # 4. spaCy + English model
 pip install spacy --quiet

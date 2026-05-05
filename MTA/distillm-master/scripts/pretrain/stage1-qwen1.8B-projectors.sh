@@ -27,12 +27,12 @@ TEACHER_CKPT_NAME="qwen1.5-1.8B-sft-dolly"
 
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=32
+BATCH_SIZE=16
 EVAL_BATCH_SIZE=64
-GRAD_ACC=1
+GRAD_ACC=2
 D_BOTTLENECK=64
 PROJECTOR_EPOCHS=10
-PROJECTOR_LR=1e-3   
+PROJECTOR_LR=1e-4   
 
 SAVE_PATH="${BASE_PATH}/results/qwen/projectors/spanresidual_qwen1.8B_paper"
 SEED=42

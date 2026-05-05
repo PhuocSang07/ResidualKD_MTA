@@ -25,12 +25,12 @@ TEACHER_CKPT="VoCuc/Mistral7B_Dolly_SFT"
 TEACHER_CKPT_NAME="mistral-7B-dolly-sft"
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/mistral/"
 
-BATCH_SIZE=64
+BATCH_SIZE=16
 EVAL_BATCH_SIZE=64
-GRAD_ACC=1
+GRAD_ACC=2
 D_BOTTLENECK=64
 PROJECTOR_EPOCHS=10
-PROJECTOR_LR=1e-3
+PROJECTOR_LR=1e-4
 
 SAVE_PATH="${BASE_PATH}/results/mistral/projectors/spanresidual_mistral7B_v2"
 SEED=42
@@ -60,8 +60,8 @@ OPTS+=" --clip-grad 1.0"
 OPTS+=" --lr-decay-style cosine"
 OPTS+=" --warmup-iters 0"
 OPTS+=" --lr-min 1e-6"
-OPTS+=" --max-length 512"
-OPTS+=" --max-prompt-length 256"
+OPTS+=" --max-length 256"
+OPTS+=" --max-prompt-length 128"
 OPTS+=" --do-train"
 OPTS+=" --do-valid"
 OPTS+=" --type projector-pretrain"

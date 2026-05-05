@@ -29,12 +29,12 @@ TEACHER_CKPT_NAME="qwen2.5-7B-dolly-sft"
 # Qwen2.5 uses the same tiktoken-based tokenizer family as Qwen1.5 (vocab=151936).
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=32
+BATCH_SIZE=16
 EVAL_BATCH_SIZE=64
-GRAD_ACC=1
+GRAD_ACC=2
 D_BOTTLENECK=64
 PROJECTOR_EPOCHS=10
-PROJECTOR_LR=1e-3
+PROJECTOR_LR=1e-4
 
 SAVE_PATH="${BASE_PATH}/results/qwen2.5/projectors/spanresidual_qwen2.5-7B"
 SEED=42
@@ -64,8 +64,8 @@ OPTS+=" --clip-grad 1.0"
 OPTS+=" --lr-decay-style cosine"
 OPTS+=" --warmup-iters 0"
 OPTS+=" --lr-min 1e-6"
-OPTS+=" --max-length 512"
-OPTS+=" --max-prompt-length 256"
+OPTS+=" --max-length 256"
+OPTS+=" --max-prompt-length 128"
 OPTS+=" --do-train"
 OPTS+=" --do-valid"
 OPTS+=" --type projector-pretrain"

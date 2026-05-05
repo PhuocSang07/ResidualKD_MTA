@@ -27,6 +27,9 @@ build/
 *.bin
 *.pt
 *.pth
+# exception: small tokenized data files (not model weights)
+!MTA/distillm-master/processed_data/**/*.bin
+!MTA/distillm-master/processed_data/**/*.idx
 adapter_config.json
 tokenizer_config.json
 generation_config.json

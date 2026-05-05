@@ -1,0 +1,46 @@
+{
+  "builder_name": "json",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "json",
+  "dataset_size": 2781354,
+  "description": "",
+  "download_checksums": {
+    "/mnt/hungpv/projects/Span-FDD/distillm-2-master/data/reformatted/qwen1.5/dev.json": {
+      "num_bytes": 2870663,
+      "checksum": null
+    }
+  },
+  "download_size": 2870663,
+  "features": {
+    "prompt": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "chosen": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "rejected": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 5652017,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 2781354,
+      "num_examples": 1000,
+      "dataset_name": "json"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

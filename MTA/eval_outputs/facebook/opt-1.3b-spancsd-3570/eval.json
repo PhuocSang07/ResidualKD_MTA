@@ -1,0 +1,26 @@
+{
+    "sni": {
+        "dataset_name": "S-NI",
+        "dataset_path": "./data/sinst/11_/valid.jsonl",
+        "rouge_l_f1": 12.190154215544867,
+        "status": "success"
+    },
+    "dolly": {
+        "dataset_name": "Dolly",
+        "dataset_path": "./data/dolly/valid.jsonl",
+        "rouge_l_f1": 17.007976365631496,
+        "status": "success"
+    },
+    "self_instruct": {
+        "dataset_name": "Self-Instruct",
+        "dataset_path": "./data/self-inst/valid.jsonl",
+        "rouge_l_f1": 8.116011667694773,
+        "status": "success"
+    },
+    "vicuna": {
+        "dataset_name": "Vicuna",
+        "dataset_path": "./data/vicuna/valid.jsonl",
+        "rouge_l_f1": 12.663326912054293,
+        "status": "success"
+    }
+}

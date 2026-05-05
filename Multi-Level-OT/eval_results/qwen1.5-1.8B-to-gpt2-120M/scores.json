@@ -1,0 +1,31 @@
+{
+  "model_path": "/mnt/phongdq/projects/mta/Multi-Level-OT/output/qwen1.5-1.8B-to-gpt2-120M/14245",
+  "dolly": {
+    "rouge_l_avg": 19.7673,
+    "rouge1": 23.3594,
+    "rouge2": 9.2088,
+    "rougeL": 18.4012,
+    "rougeLsum": 19.1079
+  },
+  "sni": {
+    "rouge_l_avg": 21.2328,
+    "rouge1": 22.8665,
+    "rouge2": 9.885,
+    "rougeL": 19.7218,
+    "rougeLsum": 20.1803
+  },
+  "self_instruct": {
+    "rouge_l_avg": 10.8785,
+    "rouge1": 12.7728,
+    "rouge2": 3.7176,
+    "rougeL": 10.8833,
+    "rougeLsum": 11.7198
+  },
+  "vicuna": {
+    "rouge_l_avg": 12.3418,
+    "rouge1": 17.3141,
+    "rouge2": 3.9246,
+    "rougeL": 11.4029,
+    "rougeLsum": 14.7261
+  }
+}

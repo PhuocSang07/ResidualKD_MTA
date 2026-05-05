@@ -1,0 +1,131 @@
+#!/bin/bash
+# Stage 2 — SpanResidual KD (paper-faithful) for Setup A.
+# Cross-tokenizer: Qwen1.5-1.8B (teacher) -> GPT2-120M (student).
+# Implements On et al. ICLR 2026 §3.1-3.5 with NO MTA span loss.
+#
+# Pre-requisite: pretrain-qwen1.8B-projectors.sh -> projector_best.pt
+#
+# Loss (Eq.11):  L = lambda_res * L_res + (1 - lambda_res) * L_SFT
+#   L_res (Eq.6): CE(W_S * (h_S - beta * proj_to_S * 1[teacher_wrong]), labels)
+#   beta  (Eq.5): sqrt(d_S/d_A) * mean(||h_S|| / ||proj_to_S||)  — no clamp
+#   indicator: argmax(W_S * proj_to_S) != labels  for cross-tokenizer
+
+GPUS=(0)
+export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
+export TOKENIZERS_PARALLELISM=false
+
+MASTER_ADDR=localhost
+MASTER_PORT=68$(($RANDOM%90+10))
+NNODES=1
+NODE_RANK=0
+GPUS_PER_NODE=${#GPUS[@]}
+
+DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE \
+                  --nnodes $NNODES \
+                  --node_rank $NODE_RANK \
+                  --master_addr $MASTER_ADDR \
+                  --master_port $MASTER_PORT"
+
+BASE_PATH=./distillm-master
+
+CKPT_NAME="gpt2-base"
+CKPT="openai-community/gpt2"
+
+TEACHER_CKPT="VoCuc/Qwen1.5_1.8B_SFT_Dolly"
+TEACHER_CKPT_NAME="qwen1.5-1.8B-sft-dolly"
+
+# Projector pretrained per Stage 1
+PROJECTOR_PATH="${BASE_PATH}/results/qwen/projectors/spanresidual_qwen1.8B_paper/projector_best.pt"
+
+STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
+TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
+
+BATCH_SIZE=32
+LR=1e-4
+GRAD_ACC=1
+EVAL_BATCH_SIZE=32
+EPOCHS=10
+MAX_LENGTH=256
+
+# Paper Eq.11: lambda_res balances L_res vs L_SFT.
+# 0.5 is the symmetric default; ablation in paper Table 3 uses this.
+LAMBDA_RES=0.5
+# Short warmup to stabilise random P_S->A and P_A->S projectors.
+# Set to 0 for strict paper-faithful (Eq.11 has no warmup).
+LAMBDA_RES_WARMUP=50
+GAMMA_SPAN=0.0     # NO MTA span loss in paper-faithful run
+W_SPAN_LOSS=0.0
+
+SAVE_PATH="${BASE_PATH}/results/gpt2/train/spanresidual_paper_A_0.1B_qwen1.8B"
+SEED=42
+
+OPTS=""
+OPTS+=" --base-path ${BASE_PATH}"
+OPTS+=" --model-path ${CKPT}"
+OPTS+=" --model-type gpt2"
+OPTS+=" --ckpt-name ${CKPT_NAME}"
+OPTS+=" --teacher-model-path ${TEACHER_CKPT}"
+OPTS+=" --teacher-ckpt-name ${TEACHER_CKPT_NAME}"
+OPTS+=" --teacher-model-type qwen"
+OPTS+=" --teacher-model-fp16"
+OPTS+=" --n-gpu ${GPUS_PER_NODE}"
+OPTS+=" --projector-load-path ${PROJECTOR_PATH}"
+OPTS+=" --d-bottleneck 64"
+OPTS+=" --lambda-res ${LAMBDA_RES}"
+OPTS+=" --lambda-res-warmup-steps ${LAMBDA_RES_WARMUP}"
+OPTS+=" --gamma-span ${GAMMA_SPAN}"
+OPTS+=" --data-dir ${STUDENT_DATA_DIR}"
+OPTS+=" --teacher-data-dir ${TEACHER_DATA_DIR}"
+OPTS+=" --num-workers 1"
+OPTS+=" --dev-num 1000"
+OPTS+=" --lr ${LR}"
+OPTS+=" --batch-size ${BATCH_SIZE}"
+OPTS+=" --eval-batch-size ${EVAL_BATCH_SIZE}"
+OPTS+=" --gradient-accumulation-steps ${GRAD_ACC}"
+OPTS+=" --warmup-iters 100"
+OPTS+=" --lr-decay-style cosine"
+OPTS+=" --weight-decay 1e-2"
+OPTS+=" --clip-grad 1.0"
+OPTS+=" --epochs ${EPOCHS}"
+OPTS+=" --kd-ratio 1.0"
+OPTS+=" --warmup-ratio 0.1"
+OPTS+=" --w-span-loss ${W_SPAN_LOSS}"
+OPTS+=" --max-length ${MAX_LENGTH}"
+OPTS+=" --max-prompt-length 128"
+OPTS+=" --do-train"
+OPTS+=" --do-valid"
+OPTS+=" --save-interval -1"
+OPTS+=" --eval-interval -1"
+OPTS+=" --eval-gen"
+OPTS+=" --log-interval 10"
+OPTS+=" --mid-log-num -1"
+OPTS+=" --save ${SAVE_PATH}"
+OPTS+=" --type adaptive-srkl"
+OPTS+=" --seed ${SEED}"
+OPTS+=" --deepspeed"
+OPTS+=" --deepspeed_config ${BASE_PATH}/configs/deepspeed/ds_config_bf16.json"
+OPTS+=" --do-sample"
+OPTS+=" --top-k 0"
+OPTS+=" --top-p 1.0"
+OPTS+=" --temperature 1.0"
+OPTS+=" --gen-num-beams 1"
+OPTS+=" --gen-top-p 1.0"
+OPTS+=" --init-threshold 0.0"
+OPTS+=" --loss-eps 0.1"
+OPTS+=" --capacity 1000"
+OPTS+=" --student-gen"
+# Layer mapping kept for the projectors module list (unused when gamma_span=0)
+OPTS+=" --teacher_layer_mapping 8 16 24"
+OPTS+=" --student_layer_mapping 4 8 12"
+OPTS+=" --split_layer_mapping 0 1 3 3"
+
+export NCCL_DEBUG=""
+export WANDB_DISABLED=True
+export TF_CPP_MIN_LOG_LEVEL=3
+export PYTHONPATH=${BASE_PATH}
+CMD="torchrun ${DISTRIBUTED_ARGS} ${BASE_PATH}/span_residual_finetune.py ${OPTS} $@"
+
+echo ${CMD}
+echo "PYTHONPATH=${PYTHONPATH}"
+mkdir -p ${SAVE_PATH}
+CODE_BASE=HF ${CMD}

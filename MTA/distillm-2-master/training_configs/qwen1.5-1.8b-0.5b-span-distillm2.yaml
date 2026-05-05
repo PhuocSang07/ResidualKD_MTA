@@ -1,0 +1,64 @@
+# Model arguments
+model_name_or_path: Qwen/Qwen1.5-0.5B
+ref_model_name_or_path: VoCuc/Qwen1.5_1.8B_SFT
+torch_dtype: bfloat16
+attn_implementation: sdpa
+
+# Data training arguments
+dataset_mixer:
+  distillm-2-master/data/reformatted/qwen1.5: 1.0
+dataset_splits:
+- train
+- test
+preprocessing_num_workers: 8
+
+# DistiLLMTrainer arugments
+bf16: true
+do_eval: true
+eval_steps: 10000000
+gradient_accumulation_steps: 2
+hub_model_id: qwen
+learning_rate: 5.0e-5
+log_level: info
+logging_steps: 10
+lr_scheduler_type: cosine
+max_length: 256
+max_prompt_length: 128
+num_train_epochs: 5
+optim: adamw_torch
+output_dir: ./distillm-2-master/outputs/qwen1.5-0.5b-span-distillm2
+run_name: qwen1.5-0.5b-span-distillm2
+per_device_train_batch_size: 4
+per_device_eval_batch_size: 4
+push_to_hub: false
+# save_strategy: "steps"
+# save_steps: 200
+# save_total_limit: 20
+save_strategy: "epoch"
+save_total_limit: 3 
+save_only_model: true
+seed: 42
+warmup_ratio: 0.1
+loss_type: distillm_v2
+teacher_layer_mapping:
+- 14
+- 16
+- 18
+- 20
+- 22
+- 24
+student_layer_mapping:
+- 14
+- 16
+- 18
+- 20
+- 22
+- 24
+split_layer_mapping:
+- 0
+- 1
+- 6
+- 6
+w_span_loss: 2.0
+model_type: qwen
+proj_lr: 5.0e-4

@@ -1,0 +1,31 @@
+{
+  "model_path": "/teamspace/studios/this_studio/mlj-exp/MTA/distillm-master/results/gpt2/train/spanresidual_baseline_D_0.1B_mistral7B/801",
+  "dolly": {
+    "rouge_l_avg": 21.6044,
+    "rouge1": 26.3043,
+    "rouge2": 11.8914,
+    "rougeL": 21.2906,
+    "rougeLsum": 22.4085
+  },
+  "sni": {
+    "rouge_l_avg": 17.8922,
+    "rouge1": 20.4529,
+    "rouge2": 8.5398,
+    "rougeL": 17.2434,
+    "rougeLsum": 17.6468
+  },
+  "self_instruct": {
+    "rouge_l_avg": 9.3002,
+    "rouge1": 10.1235,
+    "rouge2": 2.4035,
+    "rougeL": 8.4149,
+    "rougeLsum": 8.8975
+  },
+  "vicuna": {
+    "rouge_l_avg": 14.4746,
+    "rouge1": 19.3685,
+    "rouge2": 4.3863,
+    "rougeL": 13.2012,
+    "rougeLsum": 16.8588
+  }
+}

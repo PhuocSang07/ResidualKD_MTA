@@ -1,0 +1,64 @@
+{
+  "builder_name": "json",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "json",
+  "dataset_size": 90127950,
+  "description": "",
+  "download_checksums": {
+    "/mnt/hungpv/projects/Span-FDD/distillm-2-master/data/reformatted/qwen_math/train.json": {
+      "num_bytes": 99073485,
+      "checksum": null
+    }
+  },
+  "download_size": 99073485,
+  "features": {
+    "prompt": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "chosen": {
+      "feature": {
+        "content": {
+          "dtype": "string",
+          "_type": "Value"
+        },
+        "role": {
+          "dtype": "string",
+          "_type": "Value"
+        }
+      },
+      "_type": "List"
+    },
+    "rejected": {
+      "feature": {
+        "content": {
+          "dtype": "string",
+          "_type": "Value"
+        },
+        "role": {
+          "dtype": "string",
+          "_type": "Value"
+        }
+      },
+      "_type": "List"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 189201435,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 90127950,
+      "num_examples": 30000,
+      "dataset_name": "json"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

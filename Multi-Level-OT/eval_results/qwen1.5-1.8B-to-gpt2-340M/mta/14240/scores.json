@@ -1,0 +1,31 @@
+{
+  "model_path": "/teamspace/studios/this_studio/mlj-exp/Multi-Level-OT/output/qwen1.5-1.8B-to-gpt2-340M/mta/14240",
+  "dolly": {
+    "rouge_l_avg": 23.7586,
+    "rouge1": 29.3875,
+    "rouge2": 13.4622,
+    "rougeL": 22.9319,
+    "rougeLsum": 24.4309
+  },
+  "sni": {
+    "rouge_l_avg": 26.6578,
+    "rouge1": 30.2203,
+    "rouge2": 15.0184,
+    "rougeL": 26.0688,
+    "rougeLsum": 26.7464
+  },
+  "self_instruct": {
+    "rouge_l_avg": 14.1111,
+    "rouge1": 16.4115,
+    "rouge2": 5.5439,
+    "rougeL": 13.6856,
+    "rougeLsum": 14.4342
+  },
+  "vicuna": {
+    "rouge_l_avg": 14.8504,
+    "rouge1": 21.9356,
+    "rouge2": 5.7423,
+    "rougeL": 14.418,
+    "rougeLsum": 18.9016
+  }
+}

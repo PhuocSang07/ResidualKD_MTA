@@ -1,0 +1,50 @@
+# local Python environment
+.venv/
+.claude/
+CLAUDE.md
+multi-level-ot/
+venv/
+env/
+hf_model_sync.ipynb
+
+# nested clone / separate repo (do not track as submodule unless intentional)
+eval_mta/
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# large archives (add local copies if needed)
+*.zip
+
+# model weights
+*.safetensors
+*.bin
+*.pt
+*.pth
+adapter_config.json
+tokenizer_config.json
+generation_config.json
+tokenizer.json
+config.json
+answers.json
+*-mta.sh
+results/
+plans/
+.vscode/
+# tools / run artifacts
+.wandb/
+wandb/
+*.log
+*.wandb
+nohup.out
+.DS_Store
+
+# large data files
+*.arrow
+*.parquet

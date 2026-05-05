@@ -1,0 +1,26 @@
+# Model checkpoints / weights
+*.safetensors
+*.bin
+*.pt
+*.pth
+
+# HuggingFace dataset cache
+*.arrow
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Baseline scripts (local-only, not tracked)
+*_baseline.sh
+
+# Training output / wandb
+output/
+wandb/
+
+# Logs
+*.out
+*.log
+nohup.out
+logs/

@@ -1,0 +1,31 @@
+{
+  "model_path": "TinyLlama/TinyLlama_v1.1",
+  "dolly": {
+    "rouge_l_avg": 26.39,
+    "rouge1": 32.2482,
+    "rouge2": 15.1888,
+    "rougeL": 24.9587,
+    "rougeLsum": 26.8579
+  },
+  "sni": {
+    "rouge_l_avg": 23.6942,
+    "rouge1": 26.4587,
+    "rouge2": 12.8833,
+    "rougeL": 22.3015,
+    "rougeLsum": 22.611
+  },
+  "self_instruct": {
+    "rouge_l_avg": 14.5459,
+    "rouge1": 17.1992,
+    "rouge2": 5.8793,
+    "rougeL": 13.6171,
+    "rougeLsum": 15.2578
+  },
+  "vicuna": {
+    "rouge_l_avg": 17.7212,
+    "rouge1": 26.643,
+    "rouge2": 7.3907,
+    "rougeL": 16.7275,
+    "rougeLsum": 22.4971
+  }
+}

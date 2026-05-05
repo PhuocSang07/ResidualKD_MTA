@@ -1,0 +1,31 @@
+{
+  "model_path": "distillm-master/results/gpt2/train/spanresidual_baseline_A_0.1B_qwen1.8B/890",
+  "dolly": {
+    "rouge_l_avg": 19.449,
+    "rouge1": 25.4252,
+    "rouge2": 9.9059,
+    "rougeL": 19.6373,
+    "rougeLsum": 20.7725
+  },
+  "sni": {
+    "rouge_l_avg": 13.8657,
+    "rouge1": 16.3021,
+    "rouge2": 5.6501,
+    "rougeL": 13.3822,
+    "rougeLsum": 13.8411
+  },
+  "self_instruct": {
+    "rouge_l_avg": 9.0244,
+    "rouge1": 10.8514,
+    "rouge2": 2.2054,
+    "rougeL": 8.4978,
+    "rougeLsum": 9.414
+  },
+  "vicuna": {
+    "rouge_l_avg": 14.9797,
+    "rouge1": 22.5076,
+    "rouge2": 5.0142,
+    "rougeL": 14.3915,
+    "rougeLsum": 18.8554
+  }
+}

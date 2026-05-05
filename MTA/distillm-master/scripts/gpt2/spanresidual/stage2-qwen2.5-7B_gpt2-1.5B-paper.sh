@@ -34,7 +34,6 @@ PROJECTOR_PATH="${BASE_PATH}/results/qwen2.5/projectors/spanresidual_qwen2.5-7B/
 STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-# Larger student+teacher → smaller batch, higher grad_acc
 BATCH_SIZE=16
 LR=1e-4
 GRAD_ACC=2 

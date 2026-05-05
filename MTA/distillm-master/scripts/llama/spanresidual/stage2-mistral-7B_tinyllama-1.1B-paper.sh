@@ -37,9 +37,9 @@ PROJECTOR_PATH="${BASE_PATH}/results/mistral/projectors/spanresidual_mistral7B_v
 # Same tokenizer → single data dir, NO teacher_data_dir
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/mistral/"
 
-BATCH_SIZE=16
+BATCH_SIZE=8
 LR=1e-4
-GRAD_ACC=2 
+GRAD_ACC=4
 EVAL_BATCH_SIZE=32
 EPOCHS=10
 MAX_LENGTH=256

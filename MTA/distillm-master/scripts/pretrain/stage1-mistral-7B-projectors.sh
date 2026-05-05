@@ -25,12 +25,12 @@ TEACHER_CKPT="VoCuc/Mistral7B_Dolly_SFT"
 TEACHER_CKPT_NAME="mistral-7B-dolly-sft"
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/mistral/"
 
-BATCH_SIZE=16
+BATCH_SIZE=32
 EVAL_BATCH_SIZE=64
-GRAD_ACC=2
+GRAD_ACC=1
 D_BOTTLENECK=64
 PROJECTOR_EPOCHS=10
-PROJECTOR_LR=1e-4
+PROJECTOR_LR=1e-3
 
 SAVE_PATH="${BASE_PATH}/results/mistral/projectors/spanresidual_mistral7B_v2"
 SEED=42

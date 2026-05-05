@@ -189,5 +189,4 @@ pyrightconfig.json
 ./results/
 ./data/
 ./checkpoints/
-./processed_data/
 *.tar.gz

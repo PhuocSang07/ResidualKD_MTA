@@ -7,8 +7,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 mkdir -p "$SCRIPT_DIR/logs"
 
 run() {
-    local script="$SCRIPT_DIR/$1"
+    local script="$PWD/$1"
     local log="$SCRIPT_DIR/logs/${1%.sh}_$(date +%Y%m%d_%H%M%S).log"
+    mkdir -p "$(dirname "$log")"
     echo "===== START: $1 =====" | tee -a "$log"
     bash "$script" 2>&1 | tee -a "$log"
     echo "===== DONE:  $1 =====" | tee -a "$log"

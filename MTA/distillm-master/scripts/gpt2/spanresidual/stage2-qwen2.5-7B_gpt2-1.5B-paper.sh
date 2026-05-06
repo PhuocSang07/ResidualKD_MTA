@@ -35,7 +35,7 @@ STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
 BATCH_SIZE=8
-LR=5e-3
+LR=2e-3
 GRAD_ACC=1
 EVAL_BATCH_SIZE=8
 EPOCHS=10

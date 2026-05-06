@@ -29,12 +29,12 @@ TEACHER_CKPT_NAME="qwen2.5-7B-dolly-sft"
 # Qwen2.5 uses the same tiktoken-based tokenizer family as Qwen1.5 (vocab=151936).
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=32
-EVAL_BATCH_SIZE=64
-GRAD_ACC=1
+BATCH_SIZE=8
+EVAL_BATCH_SIZE=16
+GRAD_ACC=2
 D_BOTTLENECK=64
 PROJECTOR_EPOCHS=10
-PROJECTOR_LR=1e-3
+PROJECTOR_LR=5e-4
 
 SAVE_PATH="${BASE_PATH}/results/qwen2.5/projectors/spanresidual_qwen2.5-7B"
 SEED=42

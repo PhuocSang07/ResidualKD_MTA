@@ -19,7 +19,7 @@ TEACHER_CKPT="VoCuc/Mistral7B_Dolly_SFT";  TEACHER_CKPT_NAME="mistral-7B-dolly-s
 PROJECTOR_PATH="${BASE_PATH}/results/mistral/projectors/spanresidual_mistral7B_v2/projector_best.pt"
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/mistral/"
 
-BATCH_SIZE=8; LR=1e-4; GRAD_ACC=4; EVAL_BATCH_SIZE=32; EPOCHS=10; MAX_LENGTH=256
+BATCH_SIZE=8; LR=1e-4; GRAD_ACC=2; EVAL_BATCH_SIZE=8; EPOCHS=10; MAX_LENGTH=256
 LAMBDA_RES=0.5; LAMBDA_RES_WARMUP=100; GAMMA_SPAN=1.0; W_SPAN_LOSS=1.0
 SAVE_PATH="${BASE_PATH}/results/llama/train/spanresidual_mta_entropy_tinyllama-1.1B_mistral-7B"; SEED=42
 

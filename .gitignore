@@ -26,18 +26,20 @@ build/
 *.safetensors
 *.bin
 *.pt
+!projector_best.pt
 *.pth
 # exception: small tokenized data files (not model weights)
 !MTA/distillm-master/processed_data/**/*.bin
 !MTA/distillm-master/processed_data/**/*.idx
+!MTA/distillm-master/results/mistral/
+!MTA/distillm-master/results/qwen
 adapter_config.json
 tokenizer_config.json
 generation_config.json
 tokenizer.json
 config.json
 answers.json
-*-mta.sh
-results/
+# results/
 plans/
 .vscode/
 # tools / run artifacts

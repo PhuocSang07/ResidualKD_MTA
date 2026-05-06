@@ -1179,3 +1179,21 @@ train | epoch   9 | g_step:   6940/  7140 | loss: 0.3754 | res: 0.3531 | span: 0
 train | epoch   9 | g_step:   6950/  7140 | loss: 0.3885 | res: 0.3688 | span: 0.0089 | λ: 0.500 | lr: 2.7445e-07 | scale: 1.0 | t: 0.469
 train | epoch   9 | g_step:   6960/  7140 | loss: 0.3966 | res: 0.3779 | span: 0.0078 | λ: 0.500 | lr: 2.5658e-07 | scale: 1.0 | t: 0.532
 train | epoch   9 | g_step:   6970/  7140 | loss: 0.4301 | res: 0.4074 | span: 0.0101 | λ: 0.500 | lr: 2.3967e-07 | scale: 1.0 | t: 0.451
+train | epoch   9 | g_step:   6980/  7140 | loss: 0.3543 | res: 0.3372 | span: 0.0083 | λ: 0.500 | lr: 2.2373e-07 | scale: 1.0 | t: 0.491
+train | epoch   9 | g_step:   6990/  7140 | loss: 0.3519 | res: 0.3413 | span: 0.0089 | λ: 0.500 | lr: 2.0875e-07 | scale: 1.0 | t: 0.499
+train | epoch   9 | g_step:   7000/  7140 | loss: 0.4030 | res: 0.3907 | span: 0.0090 | λ: 0.500 | lr: 1.9474e-07 | scale: 1.0 | t: 0.563
+train | epoch   9 | g_step:   7010/  7140 | loss: 0.3866 | res: 0.3729 | span: 0.0092 | λ: 0.500 | lr: 1.8169e-07 | scale: 1.0 | t: 0.487
+train | epoch   9 | g_step:   7020/  7140 | loss: 0.4276 | res: 0.4103 | span: 0.0103 | λ: 0.500 | lr: 1.6961e-07 | scale: 1.0 | t: 0.471
+train | epoch   9 | g_step:   7030/  7140 | loss: 0.4146 | res: 0.3901 | span: 0.0091 | λ: 0.500 | lr: 1.5849e-07 | scale: 1.0 | t: 0.456
+train | epoch   9 | g_step:   7040/  7140 | loss: 0.3352 | res: 0.3159 | span: 0.0102 | λ: 0.500 | lr: 1.4834e-07 | scale: 1.0 | t: 0.423
+train | epoch   9 | g_step:   7050/  7140 | loss: 0.4972 | res: 0.4714 | span: 0.0091 | λ: 0.500 | lr: 1.3916e-07 | scale: 1.0 | t: 0.470
+train | epoch   9 | g_step:   7060/  7140 | loss: 0.3052 | res: 0.2896 | span: 0.0082 | λ: 0.500 | lr: 1.3094e-07 | scale: 1.0 | t: 0.545
+train | epoch   9 | g_step:   7070/  7140 | loss: 0.4602 | res: 0.4443 | span: 0.0083 | λ: 0.500 | lr: 1.2369e-07 | scale: 1.0 | t: 0.478
+train | epoch   9 | g_step:   7080/  7140 | loss: 0.5162 | res: 0.4953 | span: 0.0092 | λ: 0.500 | lr: 1.1741e-07 | scale: 1.0 | t: 0.515
+train | epoch   9 | g_step:   7090/  7140 | loss: 0.4986 | res: 0.4767 | span: 0.0101 | λ: 0.500 | lr: 1.1209e-07 | scale: 1.0 | t: 0.526
+train | epoch   9 | g_step:   7100/  7140 | loss: 0.5779 | res: 0.5603 | span: 0.0087 | λ: 0.500 | lr: 1.0774e-07 | scale: 1.0 | t: 0.505
+train | epoch   9 | g_step:   7110/  7140 | loss: 0.4617 | res: 0.4334 | span: 0.0097 | λ: 0.500 | lr: 1.0435e-07 | scale: 1.0 | t: 0.436
+train | epoch   9 | g_step:   7120/  7140 | loss: 0.5004 | res: 0.4818 | span: 0.0099 | λ: 0.500 | lr: 1.0193e-07 | scale: 1.0 | t: 0.491
+train | epoch   9 | g_step:   7130/  7140 | loss: 0.4210 | res: 0.4025 | span: 0.0084 | λ: 0.500 | lr: 1.0048e-07 | scale: 1.0 | t: 0.527
+train | epoch   9 | g_step:   7140/  7140 | loss: 0.3469 | res: 0.3164 | span: 0.0105 | λ: 0.500 | lr: 1.0000e-07 | scale: 1.0 | t: 0.510
+dev | avg_loss: 3.7080078125 | {'exact_match': 3.2, 'rougeL': 25.0827} | threshold: None

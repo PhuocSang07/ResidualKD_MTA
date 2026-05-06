@@ -1,4 +1,4 @@
-#!/bin/bash
+16#!/bin/bash
 # Stage 2 — SpanResidual + MTA + Entropy Weight, Setup A
 # Cross-tokenizer: Qwen1.5-1.8B (teacher) -> GPT2-120M (student)
 # Loss: L = (1-λ)*L_SFT + λ*L_res + γ*L_span  (spans weighted by teacher confidence)
@@ -32,7 +32,7 @@ PROJECTOR_PATH="${BASE_PATH}/results/qwen/projectors/spanresidual_qwen1.8B_paper
 STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=32
+BATCH_SIZE=16
 LR=1e-4
 GRAD_ACC=1
 EVAL_BATCH_SIZE=32
@@ -42,7 +42,7 @@ MAX_LENGTH=256
 LAMBDA_RES=0.5
 LAMBDA_RES_WARMUP=50
 GAMMA_SPAN=1.0
-W_SPAN_LOSS=1.0
+W_SPAN_LOSS=3.0
 
 SAVE_PATH="${BASE_PATH}/results/gpt2/train/spanresidual_mta_entropy_A_0.1B_qwen1.8B"
 SEED=42

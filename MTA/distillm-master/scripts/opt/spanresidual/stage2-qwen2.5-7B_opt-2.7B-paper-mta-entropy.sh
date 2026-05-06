@@ -33,7 +33,7 @@ TEACHER_CKPT_NAME="qwen2.5-7B-dolly-sft"
 PROJECTOR_PATH="${BASE_PATH}/results/qwen2.5/projectors/spanresidual_qwen2.5-7B/projector_best.pt"
 
 # OPT shares GPT2 BPE tokenizer → gpt2-tokenised student data works
-STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
+STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/opt/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
 BATCH_SIZE=8

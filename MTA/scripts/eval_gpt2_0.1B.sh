@@ -4,7 +4,10 @@ SEED=42
 
 # ==== Định nghĩa các biến ====
 BASE_PATH=.
-MODEL_PATH="./distillm-master/results/gpt2/train/spanresidual_mta_entropy_A_0.1B_qwen1.8B/3213"
+# MODEL_PATH="./distillm-master/results/gpt2/train/spanresidual_mta_entropy_A_0.1B_qwen1.8B/7140"
+# MODEL_PATH="./distillm-master/results/gpt2/train/spanresidual_mta_entropy_B_0.35B_qwen1.8B/2856"
+# MODEL_PATH="./distillm-master/results/gpt2/train/spanresidual_mta_A_0.1B_qwen1.8B/7140"
+MODEL_PATH="./distillm-master/results/gpt2/train/spanresidual_paper_E_1.5B_qwen2.5-7B/5712"
 OUTPUT_DIR="${BASE_PATH}/eval_outputs/${MODEL_PATH}"
 
 

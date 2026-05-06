@@ -15,7 +15,7 @@ run() {
     echo "===== DONE:  $1 =====" | tee -a "$log"
 }
 
-# run install.sh
+run install.sh
 
 # Activate the venv installed above so torchrun is on PATH for all sub-scripts
 source "$SCRIPT_DIR/.venv/bin/activate"
@@ -27,8 +27,8 @@ cd MTA/
 # run distillm-master/scripts/pretrain/stage1-qwen2.5-7B-projectors.sh
 
 # Phase 2: Distill
-# run distillm-master/scripts/opt/spanresidual/stage2-qwen2.5-7B_opt-2.7B-paper-mta-entropy.sh
-# run distillm-master/scripts/opt/spanresidual/stage2-qwen2.5-7B_opt-2.7B-paper.sh
+run distillm-master/scripts/opt/spanresidual/stage2-qwen2.5-7B_opt-2.7B-paper-mta-entropy.sh
+run distillm-master/scripts/opt/spanresidual/stage2-qwen2.5-7B_opt-2.7B-paper.sh
 
 run distillm-master/scripts/gpt2/spanresidual/stage2-qwen2.5-7B_gpt2-1.5B-mta-entropy.sh
 run distillm-master/scripts/gpt2/spanresidual/stage2-qwen2.5-7B_gpt2-1.5B-paper.sh

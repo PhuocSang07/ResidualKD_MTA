@@ -394,7 +394,8 @@ def finetune(args, tokenizer, model: deepspeed.DeepSpeedEngine, optimizer: AdamW
                             t_uncertain = t_entropy / max_H  # (B, n_T), in [0,1]
                             # align teacher uncertainty to student positions
                             aligned_uncertain = torch.matmul(
-                                A_align.detach(), t_uncertain.unsqueeze(-1)).squeeze(-1)  # (B, n_S)
+                                A_align.detach(),
+                                t_uncertain.to(A_align.dtype).unsqueeze(-1)).squeeze(-1)  # (B, n_S)
                         teacher_wrong = (aligned_uncertain > 0.5) & resp_mask
 
                     # Eq.5: β = sqrt(d_S/d_A) * mean(||h_S|| / ||proj_to_S||).

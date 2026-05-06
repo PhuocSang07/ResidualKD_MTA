@@ -1,9 +1,9 @@
 #!/bin/bash
 # Stage 2 — SpanResidual KD (paper-faithful): Mistral-7B → TinyLLaMA-1.1B
-# SAME-tokenizer: cả 2 đều dùng LLaMA SentencePiece BPE (vocab=32000).
-# → Không cần teacher_data_dir; cross-model attention bị skip tự động.
-# → teacher_wrong = compute_residual_mask (teacher logits so sánh trực tiếp với labels).
-# Note: TinyLLaMA chỉ có bản 1.1B (không có 2.7B chính thức).
+# DIFFERENT tokenizers: Mistral-7B and TinyLlama use DIFFERENT SentencePiece models
+# despite both having vocab=32000. Data MUST be tokenized with TinyLlama tokenizer.
+# → Requires: bash scripts/llama/tools/process_data_dolly_tinyllama.sh first
+# → Data dir: processed_data/dolly/full/llama/ (NOT mistral/)
 # Teacher: VoCuc/Mistral7B_Dolly_SFT (32L, d_T=4096)
 # Student: TinyLlama/TinyLlama-1.1B-Chat-v1.0 (22L, d_S=2048)
 # Pre-requisite: scripts/pretrain/stage1-mistral-7B-projectors.sh
@@ -34,12 +34,13 @@ TEACHER_CKPT_NAME="mistral-7B-dolly-sft"
 
 PROJECTOR_PATH="${BASE_PATH}/results/mistral/projectors/spanresidual_mistral7B_v2/projector_best.pt"
 
-# Same tokenizer → single data dir, NO teacher_data_dir
-DATA_DIR="${BASE_PATH}/processed_data/dolly/full/mistral/"
+# TinyLlama tokenizer data dir (processed with TinyLlama tokenizer, NOT mistral/)
+DATA_DIR="${BASE_PATH}/processed_data/dolly/full/llama/"
+
 
 BATCH_SIZE=8
-LR=1e-4
-GRAD_ACC=2
+LR=5e-3
+GRAD_ACC=1
 EVAL_BATCH_SIZE=8
 EPOCHS=10
 MAX_LENGTH=256
@@ -68,7 +69,7 @@ OPTS+=" --lambda-res ${LAMBDA_RES}"
 OPTS+=" --lambda-res-warmup-steps ${LAMBDA_RES_WARMUP}"
 OPTS+=" --gamma-span ${GAMMA_SPAN}"
 OPTS+=" --data-dir ${DATA_DIR}"
-# NO --teacher-data-dir: same tokenizer → same data, no dual dataloader needed
+# NO --teacher-data-dir: teacher is only used for logits/residuals, not data loading
 OPTS+=" --num-workers 1"
 OPTS+=" --dev-num 1000"
 OPTS+=" --lr ${LR}"

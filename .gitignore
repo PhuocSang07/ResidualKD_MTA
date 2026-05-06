@@ -6,7 +6,8 @@ multi-level-ot/
 venv/
 env/
 hf_model_sync.ipynb
-
+answers.json
+log.txt
 # nested clone / separate repo (do not track as submodule unless intentional)
 eval_mta/
 # Python
@@ -32,6 +33,8 @@ build/
 !MTA/distillm-master/processed_data/**/*.bin
 !MTA/distillm-master/processed_data/**/*.idx
 !MTA/distillm-master/results/mistral/
+!MTA/distillm-master/results/qwen/
+!MTA/distillm-master/results/qwen2.5/
 !MTA/distillm-master/results/qwen
 adapter_config.json
 tokenizer_config.json

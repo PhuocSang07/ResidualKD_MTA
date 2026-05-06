@@ -48,6 +48,7 @@ class ProjectorSA(nn.Module):
 def cross_model_attention(
     h_S_A: torch.Tensor,
     h_T_A: torch.Tensor,
+    return_attn: bool = False,
 ) -> torch.Tensor:
     """Cross-model attention (Eq. 9-10, On et al. 2026).
 
@@ -57,15 +58,19 @@ def cross_model_attention(
     Args:
         h_S_A: (B, n_S, d_A) student hidden in anchor space
         h_T_A: (B, n_T, d_A) teacher hidden in anchor space
+        return_attn: if True, return (h_T_aligned, A) instead of just h_T_aligned
     Returns:
-        h_T_aligned: (B, n_S, d_A)
+        h_T_aligned: (B, n_S, d_A), or tuple (h_T_aligned, A) if return_attn=True
     """
     d_A = h_S_A.size(-1)
     Q = h_S_A / h_S_A.std(dim=-1, keepdim=True).clamp(min=1e-5)  # (B, n_S, d_A)
     K = h_T_A / h_T_A.std(dim=-1, keepdim=True).clamp(min=1e-5)  # (B, n_T, d_A)
     A = torch.matmul(Q, K.transpose(-1, -2)) / (d_A ** 0.5)  # (B, n_S, n_T)
     A = F.softmax(A, dim=-1)
-    return torch.matmul(A, h_T_A)   # (B, n_S, d_A)
+    out = torch.matmul(A, h_T_A)   # (B, n_S, d_A)
+    if return_attn:
+        return out, A
+    return out
 
 
 def compute_residual_correction(

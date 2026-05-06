@@ -367,9 +367,11 @@ def finetune(args, tokenizer, model: deepspeed.DeepSpeedEngine, optimizer: AdamW
 
                     # Section 3.4: cross-model attention only needed when sequence lengths differ.
                     if cross_tokenizer:
-                        h_T_A_aligned = cross_model_attention(h_S_A, h_T_A.to(h_S_A.dtype))
+                        h_T_A_aligned, A_align = cross_model_attention(
+                            h_S_A, h_T_A.to(h_S_A.dtype), return_attn=True)
                     else:
                         h_T_A_aligned = h_T_A.to(h_S_A.dtype)
+                        A_align = None
                     proj_to_S = projector_AS(h_T_A_aligned)  # (B, n_S, d_S)
 
                     resp_mask = (label != -100)
@@ -380,14 +382,20 @@ def finetune(args, tokenizer, model: deepspeed.DeepSpeedEngine, optimizer: AdamW
                         teacher_wrong = compute_residual_mask(
                             teacher_outputs.logits, label, resp_mask)
                     else:
-                        # Cross-tokenizer: teacher logits live in teacher vocab and don't
-                        # align with student labels. Use the projected teacher hidden state
-                        # routed through the student LM head to get a prediction in student
-                        # vocab, then compare with student labels.
+                        # Cross-tokenizer: teacher vocab != student vocab, so we can't
+                        # compare argmax(P_T) to student labels directly.
+                        # Use teacher entropy (in teacher vocab) as uncertainty proxy,
+                        # then align it to student positions via the cross-model attention
+                        # matrix A_align already computed above.
                         with torch.no_grad():
-                            proj_logits = model.module.lm_head(proj_to_S.detach().to(lm_dtype))
-                            teacher_pred = proj_logits.argmax(dim=-1)
-                        teacher_wrong = (teacher_pred != label) & resp_mask
+                            t_probs = F.softmax(teacher_outputs.logits.float(), dim=-1)  # (B, n_T, V_T)
+                            t_entropy = -(t_probs * t_probs.clamp(min=1e-9).log()).sum(dim=-1)  # (B, n_T)
+                            max_H = math.log(t_probs.size(-1))
+                            t_uncertain = t_entropy / max_H  # (B, n_T), in [0,1]
+                            # align teacher uncertainty to student positions
+                            aligned_uncertain = torch.matmul(
+                                A_align.detach(), t_uncertain.unsqueeze(-1)).squeeze(-1)  # (B, n_S)
+                        teacher_wrong = (aligned_uncertain > 0.5) & resp_mask
 
                     # Eq.5: β = sqrt(d_S/d_A) * mean(||h_S|| / ||proj_to_S||).
                     # Paper formula has no clamp, but with zero-init P_A->S the ratio is

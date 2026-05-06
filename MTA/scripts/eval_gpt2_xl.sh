@@ -4,7 +4,7 @@ SEED=42
 
 # ==== Định nghĩa các biến ====
 BASE_PATH=.
-MODEL_PATH="MiniLLM/teacher-gpt2-1.5B"
+MODEL_PATH="distillm-master/results/gpt2/train/spanresidual_mta_entropy_B_0.35B_qwen1.8B/7140"
 OUTPUT_DIR="${BASE_PATH}/eval_outputs/${MODEL_PATH}"
 
 
@@ -22,7 +22,7 @@ OPTS+=" --student_encoder_layers_finetuned 22"
 OPTS+=" --val_batch_size 64"
 
 # devices
-OPTS+=" --student_device cuda:1"
+OPTS+=" --student_device cuda:0"
 
 # models
 OPTS+=" --output_dir ${OUTPUT_DIR}"

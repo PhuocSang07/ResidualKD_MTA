@@ -32,10 +32,10 @@ PROJECTOR_PATH="${BASE_PATH}/results/qwen/projectors/spanresidual_qwen1.8B_paper
 STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=16
-LR=1e-4
+BATCH_SIZE=8
+LR=5e-4
 GRAD_ACC=1
-EVAL_BATCH_SIZE=32
+EVAL_BATCH_SIZE=16
 EPOCHS=10
 MAX_LENGTH=256
 
@@ -103,8 +103,8 @@ OPTS+=" --loss-eps 0.1"
 OPTS+=" --capacity 1000"
 OPTS+=" --student-gen"
 OPTS+=" --entropy_weight"
-OPTS+=" --teacher_layer_mapping 8 16 24"
-OPTS+=" --student_layer_mapping 8 16 24"
+OPTS+=" --teacher_layer_mapping 16 20 24"
+OPTS+=" --student_layer_mapping 16 20 24"
 OPTS+=" --split_layer_mapping 0 1 3 3"
 
 export NCCL_DEBUG=""

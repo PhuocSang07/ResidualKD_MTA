@@ -441,6 +441,7 @@ def finetune(args, tokenizer, model: deepspeed.DeepSpeedEngine, optimizer: AdamW
                         outputs.hidden_states, teacher_outputs.hidden_states,
                         s_offsets_mapping, t_offsets_mapping,
                         spans_offsets, words_offsets, args)
+                    span_loss_val = args.w_span_loss * span_loss_val
 
                 # ── Compose total loss ────────────────────────────────────────
                 # Warm up lambda_res: ramp 0 → target over first N steps so that

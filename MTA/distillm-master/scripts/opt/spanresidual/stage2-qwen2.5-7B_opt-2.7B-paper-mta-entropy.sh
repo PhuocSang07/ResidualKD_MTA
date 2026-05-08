@@ -48,7 +48,7 @@ LAMBDA_RES_WARMUP=100
 GAMMA_SPAN=1
 W_SPAN_LOSS=2
 
-SAVE_PATH="${BASE_PATH}/results/opt/train/spanresidual_paper_opt-2.7B_qwen2.5-7B"
+SAVE_PATH="${BASE_PATH}/results/opt/train/spanresidual_mta_entropy_opt-2.7B_qwen2.5-7B"
 SEED=42
 
 OPTS=""
@@ -113,8 +113,8 @@ OPTS+=" --peft-lora-alpha 8"
 OPTS+=" --peft-lora-dropout 0.1"
 # Qwen2.5-7B 28L → OPT-2.7B 32L; anchor at thirds
 OPTS+=" --entropy_weight"
-OPTS+=" --teacher_layer_mapping 9 19 28"
-OPTS+=" --student_layer_mapping 10 21 32"
+OPTS+=" --teacher_layer_mapping 19 23 28"
+OPTS+=" --student_layer_mapping 21 27 32"
 OPTS+=" --split_layer_mapping 0 1 3 3"
 
 export NCCL_DEBUG=""

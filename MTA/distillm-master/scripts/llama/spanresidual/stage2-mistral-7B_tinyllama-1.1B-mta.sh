@@ -17,10 +17,10 @@ BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; while [[ "$(basename 
 CKPT="TinyLlama/TinyLlama-1.1B-Chat-v1.0"; CKPT_NAME="tinyllama-1.1b"
 TEACHER_CKPT="VoCuc/Mistral7B_Dolly_SFT";  TEACHER_CKPT_NAME="mistral-7B-dolly-sft"
 PROJECTOR_PATH="${BASE_PATH}/results/mistral/projectors/spanresidual_mistral7B_v2/projector_best.pt"
-DATA_DIR="${BASE_PATH}/processed_data/dolly/full/mistral/"
+DATA_DIR="${BASE_PATH}/processed_data/dolly/full/llama/"
 
-BATCH_SIZE=8; LR=1e-4; GRAD_ACC=4; EVAL_BATCH_SIZE=32; EPOCHS=10; MAX_LENGTH=256
-LAMBDA_RES=0.5; LAMBDA_RES_WARMUP=100; GAMMA_SPAN=1.0; W_SPAN_LOSS=1.0
+BATCH_SIZE=8; LR=1e-3; GRAD_ACC=1; EVAL_BATCH_SIZE=8; EPOCHS=10; MAX_LENGTH=256
+LAMBDA_RES=0.5; LAMBDA_RES_WARMUP=100; GAMMA_SPAN=1.0; W_SPAN_LOSS=2.0
 SAVE_PATH="${BASE_PATH}/results/llama/train/spanresidual_mta_tinyllama-1.1B_mistral-7B"; SEED=42
 
 OPTS=""
@@ -39,7 +39,7 @@ OPTS+=" --deepspeed --deepspeed_config ${BASE_PATH}/configs/deepspeed/ds_config_
 OPTS+=" --do-sample --top-k 0 --top-p 1.0 --temperature 1.0 --gen-num-beams 1 --gen-top-p 1.0"
 OPTS+=" --init-threshold 0.0 --loss-eps 0.1 --capacity 1000 --student-gen"
 OPTS+=" --peft lora --peft-lora-r 256 --peft-lora-alpha 8 --peft-lora-dropout 0.1"
-OPTS+=" --teacher_layer_mapping 10 21 32 --student_layer_mapping 7 14 22 --split_layer_mapping 0 1 3 3"
+OPTS+=" --teacher_layer_mapping 21 27 32 --student_layer_mapping 15 18 22 --split_layer_mapping 0 1 3 3"
 
 export NCCL_DEBUG="" WANDB_DISABLED=True TF_CPP_MIN_LOG_LEVEL=3 PYTHONPATH=${BASE_PATH}
 CMD="torchrun ${DISTRIBUTED_ARGS} ${BASE_PATH}/span_residual_finetune.py ${OPTS} $@"

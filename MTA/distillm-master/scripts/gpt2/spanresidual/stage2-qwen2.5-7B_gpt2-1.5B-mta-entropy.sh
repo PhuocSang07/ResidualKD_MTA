@@ -20,7 +20,7 @@ PROJECTOR_PATH="${BASE_PATH}/results/qwen2.5/projectors/spanresidual_qwen2.5-7B/
 STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=8; LR=2e-3; GRAD_ACC=1; EVAL_BATCH_SIZE=8; EPOCHS=10; MAX_LENGTH=256
+BATCH_SIZE=8; LR=1e-3; GRAD_ACC=1; EVAL_BATCH_SIZE=8; EPOCHS=10; MAX_LENGTH=256
 LAMBDA_RES=0.5; LAMBDA_RES_WARMUP=100; GAMMA_SPAN=1.0; W_SPAN_LOSS=2.0
 SAVE_PATH="${BASE_PATH}/results/gpt2/train/spanresidual_mta_entropy_E_1.5B_qwen2.5-7B"; SEED=42
 
@@ -41,7 +41,7 @@ OPTS+=" --do-sample --top-k 0 --top-p 1.0 --temperature 1.0 --gen-num-beams 1 --
 OPTS+=" --init-threshold 0.0 --loss-eps 0.1 --capacity 1000 --student-gen"
 OPTS+=" --entropy_weight"
 OPTS+=" --peft lora --peft-lora-r 256 --peft-lora-alpha 8 --peft-lora-dropout 0.1"
-OPTS+=" --teacher_layer_mapping 9 19 28 --student_layer_mapping 16 32 48 --split_layer_mapping 0 1 3 3"
+OPTS+=" --teacher_layer_mapping 19 23 28 --student_layer_mapping 32 40 48 --split_layer_mapping 0 1 3 3"
 
 export NCCL_DEBUG="" WANDB_DISABLED=True TF_CPP_MIN_LOG_LEVEL=3 PYTHONPATH=${BASE_PATH}
 CMD="torchrun ${DISTRIBUTED_ARGS} ${BASE_PATH}/span_residual_finetune.py ${OPTS} $@"

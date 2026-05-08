@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.Python
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Logs
+logs/
+*.log
+
+# Training outputs (LARGE — keep projectors only)
+distillm-master/results/*/train/
+distillm-master/results/.cache/
+
+# Evaluation outputs
+eval_outputs/
+
+# Wandb
+wandb/
+
+# HuggingFace cache
+.cache/

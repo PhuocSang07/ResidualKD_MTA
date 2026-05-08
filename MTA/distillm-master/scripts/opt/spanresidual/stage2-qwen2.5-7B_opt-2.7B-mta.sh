@@ -1,14 +1,16 @@
 #!/bin/bash
-# Stage 2 — SpanResidual + MTA, Setup B
-# Cross-tokenizer: Qwen1.5-1.8B (teacher) -> GPT2-medium 345M (student)
-# Loss: L = (1-λ)*L_SFT + λ*L_res + γ*L_span
+# Stage 2 — SpanResidual + MTA (no entropy weight): Qwen2.5-7B → OPT-2.7B
+# Cross-tokenizer: Qwen2.5 tiktoken (151936) ≠ OPT/GPT2 BPE (50272)
+# Teacher: VoCuc/Qwen2.5-7B-Instruct-Dolly-SFT (28L, d_T=3584)
+# Student: facebook/opt-2.7b                    (32L, d_S=2560)
+# Pre-requisite: scripts/pretrain/stage1-qwen2.5-7B-projectors.sh
 
 GPUS=(0)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 
 MASTER_ADDR=localhost
-MASTER_PORT=69$(($RANDOM%90+10))
+MASTER_PORT=71$(($RANDOM%90+10))
 NNODES=1
 NODE_RANK=0
 GPUS_PER_NODE=${#GPUS[@]}
@@ -21,36 +23,36 @@ DISTRIBUTED_ARGS="--nproc_per_node $GPUS_PER_NODE \
 
 BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; while [[ "$(basename "$BASE_PATH")" != "distillm-master" ]] && [[ "$BASE_PATH" != "/" ]]; do BASE_PATH="$(dirname "$BASE_PATH")"; done
 
-CKPT_NAME="gpt2-medium"
-CKPT="openai-community/gpt2-medium"
+CKPT="facebook/opt-2.7b"
+CKPT_NAME="opt-2.7b"
 
-TEACHER_CKPT="VoCuc/Qwen1.5_1.8B_SFT_Dolly"
-TEACHER_CKPT_NAME="qwen1.5-1.8B-sft-dolly"
+TEACHER_CKPT="VoCuc/Qwen2.5-7B-Instruct-Dolly-SFT"
+TEACHER_CKPT_NAME="qwen2.5-7B-dolly-sft"
 
-PROJECTOR_PATH="${BASE_PATH}/results/qwen/projectors/spanresidual_qwen1.8B_paper/projector_best.pt"
+PROJECTOR_PATH="${BASE_PATH}/results/qwen2.5/projectors/spanresidual_qwen2.5-7B/projector_best.pt"
 
-STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
+STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/opt/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
 BATCH_SIZE=8
-LR=5e-4
+LR=1e-3
 GRAD_ACC=1
-EVAL_BATCH_SIZE=32
+EVAL_BATCH_SIZE=16
 EPOCHS=10
 MAX_LENGTH=256
 
 LAMBDA_RES=0.5
 LAMBDA_RES_WARMUP=100
-GAMMA_SPAN=1.0
-W_SPAN_LOSS=1.0
+GAMMA_SPAN=1
+W_SPAN_LOSS=2
 
-SAVE_PATH="${BASE_PATH}/results/gpt2/train/spanresidual_mta_B_0.35B_qwen1.8B"
+SAVE_PATH="${BASE_PATH}/results/opt/train/spanresidual_mta_opt-2.7B_qwen2.5-7B"
 SEED=42
 
 OPTS=""
 OPTS+=" --base-path ${BASE_PATH}"
 OPTS+=" --model-path ${CKPT}"
-OPTS+=" --model-type gpt2"
+OPTS+=" --model-type opt"
 OPTS+=" --ckpt-name ${CKPT_NAME}"
 OPTS+=" --teacher-model-path ${TEACHER_CKPT}"
 OPTS+=" --teacher-ckpt-name ${TEACHER_CKPT_NAME}"
@@ -72,7 +74,7 @@ OPTS+=" --eval-batch-size ${EVAL_BATCH_SIZE}"
 OPTS+=" --gradient-accumulation-steps ${GRAD_ACC}"
 OPTS+=" --warmup-iters 0"
 OPTS+=" --lr-decay-style cosine"
-OPTS+=" --weight-decay 5e-2"
+OPTS+=" --weight-decay 1e-2"
 OPTS+=" --clip-grad 1.0"
 OPTS+=" --epochs ${EPOCHS}"
 OPTS+=" --kd-ratio 1.0"
@@ -102,8 +104,15 @@ OPTS+=" --init-threshold 0.0"
 OPTS+=" --loss-eps 0.1"
 OPTS+=" --capacity 1000"
 OPTS+=" --student-gen"
-OPTS+=" --teacher_layer_mapping 16 20 24"
-OPTS+=" --student_layer_mapping 16 20 24"
+# LoRA
+OPTS+=" --peft lora"
+OPTS+=" --peft-lora-r 256"
+OPTS+=" --peft-lora-alpha 8"
+OPTS+=" --peft-lora-dropout 0.1"
+# Qwen2.5-7B 28L → OPT-2.7B 32L; upper-region anchors (Paradigm B-3L)
+# NOTE: NO --entropy_weight flag (this is the no-entropy MTA variant)
+OPTS+=" --teacher_layer_mapping 19 23 28"
+OPTS+=" --student_layer_mapping 21 27 32"
 OPTS+=" --split_layer_mapping 0 1 3 3"
 
 export NCCL_DEBUG=""

@@ -33,8 +33,8 @@ STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
 BATCH_SIZE=8
-LR=2e-3
-GRAD_ACC=2
+LR=5e-4
+GRAD_ACC=1
 EVAL_BATCH_SIZE=16
 EPOCHS=10
 MAX_LENGTH=256
@@ -102,8 +102,8 @@ OPTS+=" --init-threshold 0.0"
 OPTS+=" --loss-eps 0.1"
 OPTS+=" --capacity 1000"
 OPTS+=" --student-gen"
-OPTS+=" --teacher_layer_mapping 8 16 24"
-OPTS+=" --student_layer_mapping 4 8 12"
+OPTS+=" --teacher_layer_mapping 16 20 24"
+OPTS+=" --student_layer_mapping 8 10 12"
 OPTS+=" --split_layer_mapping 0 1 3 3"
 
 export NCCL_DEBUG=""

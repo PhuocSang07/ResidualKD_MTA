@@ -2,7 +2,7 @@
 # Stage 2 — SpanResidual + MTA, Mistral-7B -> TinyLLaMA-1.1B
 # Same-tokenizer (LLaMA SentencePiece, vocab=32000) — không cần teacher_data_dir
 
-GPUS=(0)
+GPUS=(0 1)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 
@@ -19,7 +19,7 @@ TEACHER_CKPT="VoCuc/Mistral7B_Dolly_SFT";  TEACHER_CKPT_NAME="mistral-7B-dolly-s
 PROJECTOR_PATH="${BASE_PATH}/results/mistral/projectors/spanresidual_mistral7B_v2/projector_best.pt"
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/llama/"
 
-BATCH_SIZE=8; LR=1e-3; GRAD_ACC=1; EVAL_BATCH_SIZE=8; EPOCHS=10; MAX_LENGTH=256
+BATCH_SIZE=2; LR=1e-3; GRAD_ACC=2; EVAL_BATCH_SIZE=2; EPOCHS=10; MAX_LENGTH=256
 LAMBDA_RES=0.5; LAMBDA_RES_WARMUP=100; GAMMA_SPAN=1.0; W_SPAN_LOSS=2.0
 SAVE_PATH="${BASE_PATH}/results/llama/train/spanresidual_mta_tinyllama-1.1B_mistral-7B"; SEED=42
 

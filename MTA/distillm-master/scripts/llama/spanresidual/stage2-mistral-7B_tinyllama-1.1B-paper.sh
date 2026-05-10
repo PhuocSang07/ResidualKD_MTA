@@ -8,7 +8,7 @@
 # Student: TinyLlama/TinyLlama-1.1B-Chat-v1.0 (22L, d_S=2048)
 # Pre-requisite: scripts/pretrain/stage1-mistral-7B-projectors.sh
 
-GPUS=(0)
+GPUS=(0 1)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 
@@ -38,10 +38,10 @@ PROJECTOR_PATH="${BASE_PATH}/results/mistral/projectors/spanresidual_mistral7B_v
 DATA_DIR="${BASE_PATH}/processed_data/dolly/full/llama/"
 
 
-BATCH_SIZE=8
+BATCH_SIZE=2
 LR=1e-3
-GRAD_ACC=1
-EVAL_BATCH_SIZE=8
+GRAD_ACC=2
+EVAL_BATCH_SIZE=2
 EPOCHS=10
 MAX_LENGTH=256
 

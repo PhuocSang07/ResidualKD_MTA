@@ -3,7 +3,7 @@
 # Cross-tokenizer: Qwen1.5-1.8B (teacher) -> GPT2-medium 345M (student)
 # Loss: L = (1-λ)*L_SFT + λ*L_res + γ*L_span
 
-GPUS=(0)
+GPUS=(0 1)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 
@@ -32,10 +32,10 @@ PROJECTOR_PATH="${BASE_PATH}/results/qwen/projectors/spanresidual_qwen1.8B_paper
 STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=8
+BATCH_SIZE=2
 LR=5e-4
-GRAD_ACC=1
-EVAL_BATCH_SIZE=32
+GRAD_ACC=2
+EVAL_BATCH_SIZE=8
 EPOCHS=10
 MAX_LENGTH=256
 

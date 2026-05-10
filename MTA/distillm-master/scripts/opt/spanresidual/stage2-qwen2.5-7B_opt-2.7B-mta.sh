@@ -5,7 +5,7 @@
 # Student: facebook/opt-2.7b                    (32L, d_S=2560)
 # Pre-requisite: scripts/pretrain/stage1-qwen2.5-7B-projectors.sh
 
-GPUS=(0)
+GPUS=(0 1)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 
@@ -34,10 +34,10 @@ PROJECTOR_PATH="${BASE_PATH}/results/qwen2.5/projectors/spanresidual_qwen2.5-7B/
 STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/opt/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=8
+BATCH_SIZE=2
 LR=1e-3
-GRAD_ACC=1
-EVAL_BATCH_SIZE=16
+GRAD_ACC=2
+EVAL_BATCH_SIZE=4
 EPOCHS=10
 MAX_LENGTH=256
 

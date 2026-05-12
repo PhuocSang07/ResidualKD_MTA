@@ -6,7 +6,7 @@
 # OPT uses the same GPT2-style BPE tokenizer → reuse gpt2/ student data.
 # Pre-requisite: scripts/pretrain/stage1-qwen2.5-7B-projectors.sh
 
-GPUS=(0 1)
+GPUS=(0)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 

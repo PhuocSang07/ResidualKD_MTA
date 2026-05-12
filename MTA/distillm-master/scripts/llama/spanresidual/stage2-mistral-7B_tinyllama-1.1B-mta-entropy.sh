@@ -2,7 +2,7 @@
 # Stage 2 — SpanResidual + MTA + Entropy Weight, Mistral-7B -> TinyLLaMA-1.1B
 # Same-tokenizer (LLaMA SentencePiece, vocab=32000) — không cần teacher_data_dir
 
-GPUS=(0 1)
+GPUS=(0)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 

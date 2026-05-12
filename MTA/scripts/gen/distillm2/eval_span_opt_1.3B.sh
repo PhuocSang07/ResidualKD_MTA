@@ -18,8 +18,6 @@ OPTS=""
 OPTS+=" --train_data ${BASE_PATH}/data/dolly/train.jsonl"
 OPTS+=" --val_data ${BASE_PATH}/data/dolly/dev.jsonl"
 OPTS+=" --test_data ${BASE_PATH}/data/dolly/valid.jsonl"
-OPTS+=" --teacher_layers_mapping 32"
-OPTS+=" --student_encoder_layers_finetuned 22"
 
 # training
 OPTS+=" --val_batch_size 32"

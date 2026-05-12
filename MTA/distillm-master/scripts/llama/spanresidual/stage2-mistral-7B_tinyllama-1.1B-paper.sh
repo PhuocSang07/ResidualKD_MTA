@@ -8,7 +8,7 @@
 # Student: TinyLlama/TinyLlama-1.1B-Chat-v1.0 (22L, d_S=2048)
 # Pre-requisite: scripts/pretrain/stage1-mistral-7B-projectors.sh
 
-GPUS=(0 1)
+GPUS=(0)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 

@@ -3,7 +3,7 @@
 # Cross-tokenizer: Qwen1.5-1.8B (teacher) -> GPT2-medium 345M (student)
 # Loss: L = (1-λ)*L_SFT + λ*L_res + γ*L_span
 
-GPUS=(0 1)
+GPUS=(0)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 

@@ -2,7 +2,7 @@
 # Stage 2 — SpanResidual + MTA, Setup E
 # Cross-tokenizer: Qwen2.5-7B (teacher) -> GPT2-XL 1.5B (student)
 
-GPUS=(0 1)
+GPUS=(0)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 

@@ -5,7 +5,7 @@
 # Student: facebook/opt-2.7b                    (32L, d_S=2560)
 # Pre-requisite: scripts/pretrain/stage1-qwen2.5-7B-projectors.sh
 
-GPUS=(0 1)
+GPUS=(0)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 export TOKENIZERS_PARALLELISM=false
 

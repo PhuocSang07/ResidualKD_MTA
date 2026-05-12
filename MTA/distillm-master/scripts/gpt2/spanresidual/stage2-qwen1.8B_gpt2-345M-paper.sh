@@ -35,10 +35,10 @@ PROJECTOR_PATH="${BASE_PATH}/results/qwen/projectors/spanresidual_qwen1.8B_paper
 STUDENT_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/gpt2/"
 TEACHER_DATA_DIR="${BASE_PATH}/processed_data/dolly/full/qwen/"
 
-BATCH_SIZE=2
+BATCH_SIZE=8
 LR=5e-4
-GRAD_ACC=2
-EVAL_BATCH_SIZE=4
+GRAD_ACC=1
+EVAL_BATCH_SIZE=64
 EPOCHS=10            
 MAX_LENGTH=256
 

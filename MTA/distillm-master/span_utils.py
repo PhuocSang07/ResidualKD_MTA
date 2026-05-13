@@ -27,117 +27,171 @@ def compute_token_weights(hidden_state, attention_mask):
     return token_weights.detach()
 
 def aggregate_spans_for_model(hidden_states, layer_weights, attention_mask, offsets_mapping, spans_offsets, entropy_weights=None):
-    
+
     device = hidden_states.device
     B_size, SeqLen, D = hidden_states.shape
-    
+
     span_tensors = [
-        torch.tensor(s, dtype=torch.long, device=device) if len(s) > 0 
+        torch.tensor(s, dtype=torch.long, device=device) if len(s) > 0
         else torch.empty((0, 2), dtype=torch.long, device=device)
         for s in spans_offsets
     ]
     padded_spans = pad_sequence(span_tensors, batch_first=True, padding_value=0)
-    
+
     if padded_spans.numel() == 0 or padded_spans.size(1) == 0:
-        return None, None, None, None
-        
+        return None, None, None, None, None
+
     max_spans = padded_spans.size(1)
     padded_span_starts = padded_spans[:, :, 0]
     padded_span_ends = padded_spans[:, :, 1]
-    
-    lengths = torch.tensor([len(s) for s in spans_offsets], device=device) 
+
+    lengths = torch.tensor([len(s) for s in spans_offsets], device=device)
     col_indices = torch.arange(max_spans, device=device).unsqueeze(0)
     valid_span_mask = col_indices < lengths.unsqueeze(1)
-    
+
     current_offsets = offsets_mapping[:, :SeqLen, :] if offsets_mapping.shape[1] != SeqLen else offsets_mapping
-    offsets_start = current_offsets[..., 0].unsqueeze(2) 
-    offsets_end = current_offsets[..., 1].unsqueeze(2)   
-    
-    span_starts_exp = padded_span_starts.unsqueeze(1)    
-    span_ends_exp = padded_span_ends.unsqueeze(1)        
-    
+    offsets_start = current_offsets[..., 0].unsqueeze(2)
+    offsets_end = current_offsets[..., 1].unsqueeze(2)
+
+    span_starts_exp = padded_span_starts.unsqueeze(1)
+    span_ends_exp = padded_span_ends.unsqueeze(1)
+
     token_in_span_map = (offsets_start + 1 >= span_starts_exp) & (offsets_end <= span_ends_exp)
-    token_in_span_map = token_in_span_map & attention_mask.unsqueeze(2).bool() 
-    
-    A = token_in_span_map.transpose(1, 2).float() 
-    
-    weighted_hidden = hidden_states * layer_weights.unsqueeze(-1) 
-    span_sum = torch.bmm(A, weighted_hidden)               
-    weight_sum = torch.bmm(A, layer_weights.unsqueeze(-1)).squeeze(-1) 
-    
+    token_in_span_map = token_in_span_map & attention_mask.unsqueeze(2).bool()
+
+    # token_in_any_span_mask: (B, SeqLen) — True if this token belongs to ANY span.
+    # Exposed so the caller can compute DSKD2-style per-token cosine loss.
+    token_in_any_span = token_in_span_map.any(dim=2)
+
+    A = token_in_span_map.transpose(1, 2).float()
+
+    weighted_hidden = hidden_states * layer_weights.unsqueeze(-1)
+    span_sum = torch.bmm(A, weighted_hidden)
+    weight_sum = torch.bmm(A, layer_weights.unsqueeze(-1)).squeeze(-1)
+
     if entropy_weights is not None:
         ent_weight_sum = torch.bmm(A, entropy_weights.unsqueeze(-1)).squeeze(-1)
-        span_lengths = A.sum(dim=-1).clamp(min=1e-5) 
-        ent_weight_mean = ent_weight_sum / span_lengths 
+        span_lengths = A.sum(dim=-1).clamp(min=1e-5)
+        ent_weight_mean = ent_weight_sum / span_lengths
         final_ent_weight = ent_weight_mean
     else:
         final_ent_weight = weight_sum
-    
-    span_repr = span_sum / weight_sum.unsqueeze(-1).clamp(min=1e-5)      
-    
-    return span_repr, weight_sum, final_ent_weight, valid_span_mask
+
+    span_repr = span_sum / weight_sum.unsqueeze(-1).clamp(min=1e-5)
+
+    return span_repr, weight_sum, final_ent_weight, valid_span_mask, token_in_any_span
 
 
-def compute_hidden_span_loss(projector, s_span_repr, t_span_repr, valid_span_mask, w_sum):
+def compute_hidden_span_loss(projector, s_span_repr, t_span_repr, valid_span_mask, w_sum,
+                             s_hidden=None, t_hidden=None,
+                             s_token_in_span_mask=None,
+                             t_layer_weights=None, t_entropy_weights_full=None,
+                             same_tokenizer=False):
+    """Match mta_dskd_v2/criterions/dual_space_kd_v2_with_eta.py::compute_hidden_span_loss.
+
+    Returns `span_rel_loss + token_loss / 10.0` when `same_tokenizer=True` (DSKD2 setting).
+    Falls back to projector-on-span-repr similarity when `same_tokenizer=False`
+    (cross-tokenizer; per-position token cosine is undefined when student/teacher
+    tokenize the same source span differently).
+    """
     device = s_span_repr.device
     B_size, Max_Spans = valid_span_mask.shape
-    
     proj_dtype = next(projector.parameters()).dtype
-    s_span_proj = projector(s_span_repr.to(proj_dtype))
-    
-    valid_s = s_span_proj[valid_span_mask] # (N_valid, D)
-    valid_t = t_span_repr.to(proj_dtype)[valid_span_mask] # (N_valid, D)
-    valid_w = w_sum[valid_span_mask]       # (N_valid)
-    
+
+    if same_tokenizer:
+        # DSKD2: span similarity uses RAW span repr (each side normalized in its own dim).
+        valid_s = s_span_repr.to(proj_dtype)[valid_span_mask]   # (N_valid, D_s)
+        valid_t = t_span_repr.to(proj_dtype)[valid_span_mask]   # (N_valid, D_t)
+    else:
+        # Cross-tokenizer fallback: project student span repr to teacher space so the
+        # projector still receives gradient (token cosine is skipped below).
+        s_span_proj = projector(s_span_repr.to(proj_dtype))
+        valid_s = s_span_proj[valid_span_mask]
+        valid_t = t_span_repr.to(proj_dtype)[valid_span_mask]
+
+    valid_w = w_sum[valid_span_mask]
+
     if valid_s.size(0) == 0:
         return torch.tensor(0.0, device=device)
-        
+
     batch_indices = torch.arange(B_size, device=device).unsqueeze(1).expand(-1, Max_Spans)
-    valid_batch_ids = batch_indices[valid_span_mask] 
-    
+    valid_batch_ids = batch_indices[valid_span_mask]
+
     S_normalized = F.normalize(valid_s, p=2, dim=-1)
     T_normalized = F.normalize(valid_t, p=2, dim=-1)
-    
+
     S_sim_matrix = S_normalized @ S_normalized.T
     T_sim_matrix = T_normalized @ T_normalized.T
-    
+
     Same_Batch_Mask = (valid_batch_ids.unsqueeze(1) == valid_batch_ids.unsqueeze(0))
     Not_Self_Mask = ~torch.eye(valid_s.size(0), dtype=torch.bool, device=device)
     Final_Mask = Same_Batch_Mask & Not_Self_Mask
-    
-    S_intra_batch_similarities_flat = torch.masked_select(S_sim_matrix, Final_Mask)
-    T_intra_batch_similarities_flat = torch.masked_select(T_sim_matrix, Final_Mask)
-    
-    Pair_Weights_Matrix = valid_w.unsqueeze(1) * valid_w.unsqueeze(0)
-    Valid_Pair_Weights = torch.masked_select(Pair_Weights_Matrix, Final_Mask)
-    
-    span_rel_loss = F.mse_loss(S_intra_batch_similarities_flat, T_intra_batch_similarities_flat, reduction='none')
-    span_rel_loss = (span_rel_loss * Valid_Pair_Weights).sum() / Valid_Pair_Weights.sum().clamp(min=1e-5)
-    
-    
+
+    S_intra = torch.masked_select(S_sim_matrix, Final_Mask)
+    T_intra = torch.masked_select(T_sim_matrix, Final_Mask)
+    Pair_Weights = torch.masked_select(valid_w.unsqueeze(1) * valid_w.unsqueeze(0), Final_Mask)
+
+    span_rel_loss = F.mse_loss(S_intra, T_intra, reduction='none')
+    span_rel_loss = (span_rel_loss * Pair_Weights).sum() / Pair_Weights.sum().clamp(min=1e-5)
+
+    # Token-level cosine (DSKD2 lines 303-307). Only valid when student & teacher use
+    # the same tokenizer, so position-i hidden state aligns 1:1 across the two models.
+    if (same_tokenizer and s_hidden is not None and t_hidden is not None
+            and s_token_in_span_mask is not None and s_token_in_span_mask.any()):
+        S_tokens = s_hidden[s_token_in_span_mask].to(proj_dtype)   # (N_tokens, D_s)
+        T_tokens = t_hidden[s_token_in_span_mask].to(proj_dtype)   # (N_tokens, D_t)
+
+        s_proj = projector(S_tokens)                                # (N_tokens, D_t)
+        token_cos = F.cosine_similarity(s_proj, T_tokens, dim=-1, eps=1e-5)
+        token_loss = 1.0 - token_cos
+
+        if t_entropy_weights_full is not None:
+            token_weight = t_entropy_weights_full[s_token_in_span_mask].to(proj_dtype)
+        elif t_layer_weights is not None:
+            token_weight = t_layer_weights[s_token_in_span_mask].to(proj_dtype)
+        else:
+            token_weight = torch.ones_like(token_loss)
+
+        token_loss = (token_loss * token_weight).sum() / token_weight.sum().clamp(min=1e-5)
+        return span_rel_loss + token_loss / 10.0
+
     return span_rel_loss
 
 
-def get_span_loss(projectors, s_att_mask, t_att_mask, s_hidden_states, t_hidden_states, 
-                  s_offsets_mapping, t_offsets_mapping, spans_offsets, 
+def get_span_loss(projectors, s_att_mask, t_att_mask, s_hidden_states, t_hidden_states,
+                  s_offsets_mapping, t_offsets_mapping, spans_offsets,
                   teacher_layer_mapping, student_layer_mapping, w_t_entropy=None):
-    
+
+    # Same-tokenizer detection: span_residual_finetune.py:433 reuses the student
+    # offsets tensor as the teacher offsets in the same-tokenizer branch, so the
+    # Python `is` check is the canonical signal.
+    same_tokenizer = s_offsets_mapping is t_offsets_mapping
+
     final_loss = 0.0
-    for i, (s_idx, t_idx, projector) in enumerate(zip(student_layer_mapping, teacher_layer_mapping, projectors)):
+    for s_idx, t_idx, projector in zip(student_layer_mapping, teacher_layer_mapping, projectors):
         s_hidden = s_hidden_states[s_idx]
         t_hidden = t_hidden_states[t_idx]
-        
-        s_weights = compute_token_weights(s_hidden, s_att_mask) 
-        t_weights = compute_token_weights(t_hidden, t_att_mask) 
-        
-        s_span_repr, _, _, valid_mask = aggregate_spans_for_model(s_hidden, s_weights, s_att_mask, s_offsets_mapping, spans_offsets)
-        t_span_repr, t_weight_sum, t_ent_weight_sum, _ = aggregate_spans_for_model(t_hidden, t_weights, t_att_mask, t_offsets_mapping, spans_offsets, w_t_entropy)
-        
+
+        s_weights = compute_token_weights(s_hidden, s_att_mask)
+        t_weights = compute_token_weights(t_hidden, t_att_mask)
+
+        s_span_repr, _, _, valid_mask, s_token_mask = aggregate_spans_for_model(
+            s_hidden, s_weights, s_att_mask, s_offsets_mapping, spans_offsets)
+        t_span_repr, t_weight_sum, t_ent_weight_sum, _, _ = aggregate_spans_for_model(
+            t_hidden, t_weights, t_att_mask, t_offsets_mapping, spans_offsets, w_t_entropy)
+
         if s_span_repr is None or t_span_repr is None:
             continue
-            
+
         w_sum = t_ent_weight_sum if w_t_entropy is not None else t_weight_sum
-        span_loss = compute_hidden_span_loss(projector, s_span_repr, t_span_repr, valid_mask, w_sum)
+        span_loss = compute_hidden_span_loss(
+            projector, s_span_repr, t_span_repr, valid_mask, w_sum,
+            s_hidden=s_hidden, t_hidden=t_hidden,
+            s_token_in_span_mask=s_token_mask,
+            t_layer_weights=t_weights,
+            t_entropy_weights_full=w_t_entropy,
+            same_tokenizer=same_tokenizer,
+        )
         final_loss += span_loss
 
     return final_loss

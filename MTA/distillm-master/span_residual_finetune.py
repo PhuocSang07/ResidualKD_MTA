@@ -411,8 +411,12 @@ def finetune(args, tokenizer, model: deepspeed.DeepSpeedEngine, optimizer: AdamW
                     res_loss_val = loss_func(res_logits.float().view(-1, res_logits.shape[-1]), label.view(-1))
 
                 # ── Span loss (MTA) ───────────────────────────────────────────
-                # Per MTA-DSKD2 (latest): pool spans separately on each tokenizer using
-                # its own offsets_mapping/attention_mask, then match spans by char-offset.
+                # Match mta_dskd_v2 (criterions/dual_space_kd_v2_with_eta.py:423-432):
+                # always use STUDENT offsets/attention for both student and teacher
+                # hidden states. Both batches are padded to `args.max_length`, so the
+                # seq dim is the same and indexing into teacher hidden states with
+                # student-derived indices is shape-safe. The projector learns to
+                # absorb the cross-tokenizer positional noise (DSKD-ETA design).
                 if args.gamma_span > 0.0 and projectors is not None:
                     input_texts = tokenizer.batch_decode(model_batch["input_ids"], skip_special_tokens=True)
                     s_seqlen = model_batch["attention_mask"].shape[1]
@@ -421,17 +425,9 @@ def finetune(args, tokenizer, model: deepspeed.DeepSpeedEngine, optimizer: AdamW
                         padding="max_length", max_length=s_seqlen, truncation=True,
                         add_special_tokens=False, return_tensors="pt"
                     )["offset_mapping"].to(device)
-                    if cross_tokenizer and teacher_tokenizer is not None:
-                        t_seqlen = teacher_batch["attention_mask"].shape[1]
-                        t_offsets_mapping = teacher_tokenizer(
-                            input_texts, return_offsets_mapping=True,
-                            padding="max_length", max_length=t_seqlen, truncation=True,
-                            add_special_tokens=False, return_tensors="pt"
-                        )["offset_mapping"].to(device)
-                        t_attention_mask = teacher_batch["attention_mask"]
-                    else:
-                        t_offsets_mapping = s_offsets_mapping
-                        t_attention_mask = model_batch["attention_mask"]
+                    # Reuse the same tensors for the teacher side (DSKD2 ETA-style).
+                    t_offsets_mapping = s_offsets_mapping
+                    t_attention_mask = model_batch["attention_mask"]
                     spans_offsets, words_offsets = get_spans_offsets(input_texts, nlp, matcher)
 
                     span_loss_val = compute_overall_span_loss(

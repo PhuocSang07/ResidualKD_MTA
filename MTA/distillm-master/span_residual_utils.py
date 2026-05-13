@@ -146,7 +146,7 @@ def load_projectors(
     proj = ProjectorTA(d_T, d_A)
     if isinstance(device, int):
         device = torch.device("cuda", device)
-    state = torch.load(path, map_location=device, weights_only=True)
+    state = torch.load(path, map_location=device, weights_only=False)
     proj.load_state_dict(state)
     proj.to(device)
     proj.eval()

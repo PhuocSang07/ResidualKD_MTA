@@ -148,10 +148,17 @@ class DistributedMMapIndexedDataset(torch.utils.data.Dataset):
         return state, history
 
     def __getstate__(self):
-        return self._path + self._name + "_%d"%(self._state)
+        # Drop the non-picklable mmap / Index handles — they will be rebuilt
+        # in __setstate__ via _do_init. Keep every other attribute so the
+        # worker process can reconstruct identical state.
+        state = self.__dict__.copy()
+        state['_index'] = None
+        state['_bin_buffer'] = None
+        state['_bin_buffer_mmap'] = None
+        return state
 
     def __setstate__(self, state):
-        self._state = state
+        self.__dict__.update(state)
         self._do_init(self._path, self._name, self._cache, self._state)
 
     def _do_init(self, path, name, cache, state):
@@ -169,10 +176,13 @@ class DistributedMMapIndexedDataset(torch.utils.data.Dataset):
         self._bin_buffer = memoryview(self._bin_buffer_mmap)
 
     def __del__(self):
-        if self._bin_buffer_mmap is not None:
-            self._bin_buffer_mmap._mmap.close()
+        # Guard against partially-initialised objects (e.g. when __setstate__
+        # fails) so the deallocator doesn't raise a secondary AttributeError.
+        bin_buffer_mmap = getattr(self, '_bin_buffer_mmap', None)
+        if bin_buffer_mmap is not None:
+            bin_buffer_mmap._mmap.close()
             del self._bin_buffer_mmap
-        if self._index is not None:
+        if getattr(self, '_index', None) is not None:
             del self._index
 
     def __len__(self):
